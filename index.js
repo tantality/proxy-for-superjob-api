@@ -34,6 +34,19 @@ app.use(
 
       return headers;
     },
+    proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
+      const key = srcReq.clientIp;
+      if (cookiePerIP.has(key)) {
+        const cookies = cookiePerIP
+          .get(key)
+          .map((c) => `${c.key}=${c.value}`)
+          .join(";");
+
+        proxyReqOpts.headers["cookie"] = cookies;
+      }
+
+      return proxyReqOpts;
+    },
   })
 );
 
