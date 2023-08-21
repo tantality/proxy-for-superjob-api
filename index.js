@@ -2,12 +2,18 @@ const express = require("express");
 const proxy = require("express-http-proxy");
 const cors = require("cors");
 const requestIp = require("request-ip");
+const { LRUCache } = require("lru-cache");
 const dotenv = require("dotenv");
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3001;
-const cookiePerIP = new Map();
+const cookiePerIP = new LRUCache({
+  max: 1000,
+  ttl: 1000 * 60 * 3, // the lifetime in ms (3 min)
+  updateAgeOnGet: false,
+  updateAgeOnHas: false,
+});
 
 app.use(requestIp.mw());
 
